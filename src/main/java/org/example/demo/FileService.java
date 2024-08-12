@@ -1,26 +1,43 @@
 package org.example.demo;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 public class FileService {
 
-    public void copyFile(String sourcePath, String targetPath) throws IOException {
-        Path source = Paths.get(sourcePath);
-        Path target = Paths.get(targetPath);
-        Files.copy(source, target);
+    private static final Logger logger = LoggerFactory.getLogger(FileService.class);
+
+    public boolean copyFile(Path source, Path target) {
+        try {
+            Files.copy(source, target);
+            return true;
+        } catch (IOException e) {
+            logger.error("Failed to copy file: {} to {}", source, target, e);
+            return false;
+        }
     }
 
-    public void moveFile(String sourcePath, String targetPath) throws IOException {
-        Path source = Paths.get(sourcePath);
-        Path target = Paths.get(targetPath);
-        Files.move(source, target);
+    public boolean moveFile(Path source, Path target) {
+        try {
+            Files.move(source, target);
+            return true;
+        } catch (IOException e) {
+            logger.error("Failed to move file: {} to {}", source, target, e);
+            return false;
+        }
     }
 
-    public void deleteFile(String filePath) throws IOException {
-        Path file = Paths.get(filePath);
-        Files.delete(file);
+    public boolean deleteFile(Path file) {
+        try {
+            Files.delete(file);
+            return true;
+        } catch (IOException e) {
+            logger.error("Failed to delete file: {}", file, e);
+            return false;
+        }
     }
 }
