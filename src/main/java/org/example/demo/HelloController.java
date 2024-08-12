@@ -3,6 +3,10 @@ package org.example.demo;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
+import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
+import javafx.scene.Node;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -29,6 +33,36 @@ public class HelloController {
     private final FileService fileService = new FileService();
     private final DirectoryService directoryService = new DirectoryService();
     private final SearchService searchService = new SearchService();
+
+    @FXML
+    public void onBrowseDirectory(javafx.event.ActionEvent event) {
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        File selectedDirectory = directoryChooser.showDialog(stage);
+        if (selectedDirectory != null) {
+            directoryPathField.setText(selectedDirectory.getAbsolutePath());
+        }
+    }
+
+    @FXML
+    public void onBrowseSourceFile(javafx.event.ActionEvent event) {
+        FileChooser fileChooser = new FileChooser();
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        File selectedFile = fileChooser.showOpenDialog(stage);
+        if (selectedFile != null) {
+            sourcePathField.setText(selectedFile.getAbsolutePath());
+        }
+    }
+
+    @FXML
+    public void onBrowseTargetFile(javafx.event.ActionEvent event) {
+        FileChooser fileChooser = new FileChooser();
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        File selectedFile = fileChooser.showSaveDialog(stage);
+        if (selectedFile != null) {
+            targetPathField.setText(selectedFile.getAbsolutePath());
+        }
+    }
 
     @FXML
     public void onDisplayContents() {
@@ -69,13 +103,36 @@ public class HelloController {
 
     @FXML
     public void onDeleteDirectory() {
+        System.out.println("onDeleteDirectory method called");
         Path directory = Paths.get(directoryPathField.getText());
-        boolean success = directoryService.deleteDirectory(directory.toFile());
+        File directoryFile = directory.toFile();
+
+        if (!directoryFile.exists()) {
+            System.err.println("Directory does not exist: " + directoryFile.getAbsolutePath());
+            return;
+        }
+
+        if (!directoryFile.isDirectory()) {
+            System.err.println("The path is not a directory: " + directoryFile.getAbsolutePath());
+            return;
+        }
+
+        if (!directoryFile.canWrite()) {
+            System.err.println("No write permission for directory: " + directoryFile.getAbsolutePath());
+            return;
+        }
+
+        if (!directoryFile.canExecute()) {
+            System.err.println("No execute permission for directory: " + directoryFile.getAbsolutePath());
+            return;
+        }
+
+        boolean success = directoryService.deleteDirectory(directoryFile);
         if (success) {
-            System.out.println("Directory deleted successfully.");
-            onDisplayContents();
+            System.out.println("Directory deleted successfully: " + directoryFile.getAbsolutePath());
+            onDisplayContents(); // Refresh the display
         } else {
-            System.err.println("Failed to delete directory.");
+            System.err.println("Failed to delete directory: " + directoryFile.getAbsolutePath());
         }
     }
 

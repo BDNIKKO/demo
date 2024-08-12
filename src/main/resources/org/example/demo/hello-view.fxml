@@ -2,22 +2,52 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
 
-<AnchorPane xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.demo.HelloController">
-    <TextField fx:id="directoryPathField" layoutX="20.0" layoutY="20.0" prefWidth="300.0"/>
-    <Button layoutX="330.0" layoutY="20.0" text="Display" onAction="#onDisplayContents"/>
+<VBox xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.demo.HelloController" spacing="10">
+    <padding>
+        <Insets top="15" right="15" bottom="15" left="15"/>
+    </padding>
+    <!-- Directory Selection -->
+    <HBox spacing="10">
+        <Label text="Directory Path:"/>
+        <TextField fx:id="directoryPathField" promptText="Select or enter directory path" prefWidth="250"/>
+        <Button text="Browse..." onAction="#onBrowseDirectory"/>
+        <Button text="Display Contents" onAction="#onDisplayContents"/>
+    </HBox>
 
-    <TextField fx:id="searchField" layoutX="20.0" layoutY="60.0" prefWidth="300.0"/>
-    <Button layoutX="330.0" layoutY="60.0" text="Search" onAction="#onSearchFiles"/>
+    <!-- Search Field -->
+    <HBox spacing="10">
+        <Label text="Search Files:"/>
+        <TextField fx:id="searchField" promptText="Enter file name or extension" prefWidth="250"/>
+        <Button text="Search" onAction="#onSearchFiles"/>
+    </HBox>
 
-    <Button layoutX="20.0" layoutY="100.0" text="Create Directory" onAction="#onCreateDirectory"/>
-    <Button layoutX="150.0" layoutY="100.0" text="Delete Directory" onAction="#onDeleteDirectory"/>
+    <!-- Directory Operations -->
+    <HBox spacing="10">
+        <Button text="Create Directory" onAction="#onCreateDirectory"/>
+        <Button text="Delete Directory" onAction="#onDeleteDirectory"/>
+    </HBox>
 
-    <TextField fx:id="sourcePathField" layoutX="20.0" layoutY="140.0" prefWidth="300.0" promptText="Source File Path"/>
-    <TextField fx:id="targetPathField" layoutX="20.0" layoutY="180.0" prefWidth="300.0" promptText="Target File Path"/>
-    <Button layoutX="330.0" layoutY="140.0" text="Copy File" onAction="#onCopyFile"/>
-    <Button layoutX="330.0" layoutY="180.0" text="Move File" onAction="#onMoveFile"/>
-    <Button layoutX="330.0" layoutY="220.0" text="Delete File" onAction="#onDeleteFile"/>
+    <!-- File Operations -->
+    <HBox spacing="10">
+        <Label text="Source File:"/>
+        <TextField fx:id="sourcePathField" promptText="Select or enter source file path" prefWidth="250"/>
+        <Button text="Browse..." onAction="#onBrowseSourceFile"/>
+    </HBox>
 
-    <ListView fx:id="listView" layoutX="20.0" layoutY="260.0" prefHeight="200.0" prefWidth="350.0"/>
-</AnchorPane>
+    <HBox spacing="10">
+        <Label text="Target Path:"/>
+        <TextField fx:id="targetPathField" promptText="Select or enter target path" prefWidth="250"/>
+        <Button text="Browse..." onAction="#onBrowseTargetFile"/>
+    </HBox>
+
+    <HBox spacing="10">
+        <Button text="Copy File" onAction="#onCopyFile"/>
+        <Button text="Move File" onAction="#onMoveFile"/>
+        <Button text="Delete File" onAction="#onDeleteFile"/>
+    </HBox>
+
+    <!-- ListView for displaying directory contents -->
+    <ListView fx:id="listView" prefHeight="200" prefWidth="350"/>
+</VBox>
