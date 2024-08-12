@@ -1,16 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.VBox?>
-
 <?import javafx.scene.control.Button?>
-<VBox alignment="CENTER" spacing="20.0" xmlns:fx="http://javafx.com/fxml"
-      fx:controller="org.example.demo.HelloController">
-  <padding>
-    <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
-  </padding>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.GridPane?>
 
-  <Label fx:id="welcomeText"/>
-  <Button text="Hello!" onAction="#onHelloButtonClick"/>
-</VBox>
+<GridPane fx:controller="org.example.demo.HelloController"
+          xmlns:fx="http://javafx.com/fxml"
+          alignment="center" hgap="10" vgap="10">
+    <TextField fx:id="directoryPathField" GridPane.columnIndex="0" GridPane.rowIndex="0" promptText="Enter directory path"/>
+    <Button text="Display" onAction="#onDisplayContents" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+    <Button text="Create Directory" onAction="#onCreateDirectory" GridPane.columnIndex="2" GridPane.rowIndex="0"/>
+    <Button text="Delete Directory" onAction="#onDeleteDirectory" GridPane.columnIndex="3" GridPane.rowIndex="0"/>
+
+    <TextField fx:id="searchField" GridPane.columnIndex="0" GridPane.rowIndex="1" promptText="Search files"/>
+    <Button text="Search" onAction="#onSearchFiles" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+
+    <ListView fx:id="fileList" GridPane.columnSpan="4" GridPane.rowIndex="2"/>
+
+    <Button text="Copy File" onAction="#onCopyFile" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+    <Button text="Move File" onAction="#onMoveFile" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+    <Button text="Delete File" onAction="#onDeleteFile" GridPane.columnIndex="2" GridPane.rowIndex="3"/>
+</GridPane>
