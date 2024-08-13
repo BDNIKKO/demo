@@ -130,11 +130,15 @@ public class HelloController {
         boolean success = directoryService.deleteDirectory(directoryFile);
         if (success) {
             System.out.println("Directory deleted successfully: " + directoryFile.getAbsolutePath());
-            onDisplayContents(); // Refresh the display
+            // Do not attempt to list contents if the directory was successfully deleted
+            directoryPathField.clear();
+            listView.getItems().clear();
         } else {
             System.err.println("Failed to delete directory: " + directoryFile.getAbsolutePath());
         }
     }
+
+
 
     @FXML
     public void onCopyFile() {

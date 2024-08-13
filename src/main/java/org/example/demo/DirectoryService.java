@@ -11,21 +11,18 @@ public class DirectoryService {
         if (directory.exists()) {
             System.out.println("Attempting to delete directory: " + directory.getAbsolutePath());
 
-            // First, delete the contents recursively
-            deleteRecursively(directory);
+            // Delete contents recursively
+            boolean deletedContents = deleteRecursively(directory);
 
-            // Attempt to delete the directory itself
-            boolean deleted = directory.delete();
-            if (deleted) {
+            // If contents were deleted successfully, try to delete the directory itself
+            if (deletedContents && directory.delete()) {
                 System.out.println("Directory deleted successfully: " + directory.getAbsolutePath());
+                return true;
+            } else if (!directory.exists()) {
+                System.out.println("Directory already deleted: " + directory.getAbsolutePath());
                 return true;
             } else {
                 System.err.println("Failed to delete directory: " + directory.getAbsolutePath());
-
-                // Double-check if directory still exists before concluding failure
-                if (directory.exists()) {
-                    System.err.println("Directory still exists after deletion attempt: " + directory.getAbsolutePath());
-                }
                 return false;
             }
         } else {
@@ -34,17 +31,27 @@ public class DirectoryService {
         }
     }
 
-    private void deleteRecursively(File file) {
+    private boolean deleteRecursively(File file) {
         if (file.isDirectory()) {
             File[] files = file.listFiles();
             if (files != null) {
                 for (File f : files) {
-                    deleteRecursively(f);
+                    if (!deleteRecursively(f)) {
+                        return false;
+                    }
                 }
             }
         }
-        if (!file.delete()) {
+
+        if (file.delete()) {
+            System.out.println("Deleted: " + file.getAbsolutePath());
+            return true;
+        } else if (!file.exists()) {
+            System.out.println("File or directory already deleted: " + file.getAbsolutePath());
+            return true;  // Consider it a success if it's already gone
+        } else {
             System.err.println("Failed to delete file: " + file.getAbsolutePath());
+            return false;
         }
     }
 
