@@ -8,6 +8,7 @@
     <padding>
         <Insets top="15" right="15" bottom="15" left="15"/>
     </padding>
+
     <!-- Directory Selection -->
     <HBox spacing="10">
         <Label text="Directory Path:"/>
@@ -29,25 +30,19 @@
         <Button text="Delete Directory" onAction="#onDeleteDirectory"/>
     </HBox>
 
-    <!-- File Operations -->
-    <HBox spacing="10">
-        <Label text="Source File:"/>
-        <TextField fx:id="sourcePathField" promptText="Select or enter source file path" prefWidth="250"/>
-        <Button text="Browse..." onAction="#onBrowseSourceFile"/>
-    </HBox>
+    <!-- ListView for displaying directory contents -->
+    <ListView fx:id="listView" prefHeight="200" prefWidth="350"/>
 
+    <!-- File Operations -->
     <HBox spacing="10">
         <Label text="Target Path:"/>
         <TextField fx:id="targetPathField" promptText="Select or enter target path" prefWidth="250"/>
         <Button text="Browse..." onAction="#onBrowseTargetFile"/>
     </HBox>
 
-    <HBox spacing="10">
-        <Button text="Copy File" onAction="#onCopyFile"/>
-        <Button text="Move File" onAction="#onMoveFile"/>
-        <Button text="Delete File" onAction="#onDeleteFile"/>
+    <HBox spacing="10" fx:id="actionButtonsBox">
+        <Button text="Copy File" onAction="#onCopyFile" />
+        <Button text="Move File" onAction="#onMoveFile" />
+        <Button text="Delete File" onAction="#onDeleteFile" />
     </HBox>
-
-    <!-- ListView for displaying directory contents -->
-    <ListView fx:id="listView" prefHeight="200" prefWidth="350"/>
 </VBox>

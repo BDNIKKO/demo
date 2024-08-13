@@ -3,8 +3,8 @@ package org.example.demo;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
 import javafx.stage.DirectoryChooser;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.scene.Node;
 
@@ -15,14 +15,12 @@ import java.util.List;
 
 public class HelloController {
 
+    public HBox actionButtonsBox;
     @FXML
     private TextField directoryPathField;
 
     @FXML
     private TextField searchField;
-
-    @FXML
-    private TextField sourcePathField;
 
     @FXML
     private TextField targetPathField;
@@ -33,6 +31,8 @@ public class HelloController {
     private final FileService fileService = new FileService();
     private final DirectoryService directoryService = new DirectoryService();
     private final SearchService searchService = new SearchService();
+
+    private Path currentDirectory;
 
     @FXML
     public void onBrowseDirectory(javafx.event.ActionEvent event) {
@@ -45,29 +45,19 @@ public class HelloController {
     }
 
     @FXML
-    public void onBrowseSourceFile(javafx.event.ActionEvent event) {
-        FileChooser fileChooser = new FileChooser();
-        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        File selectedFile = fileChooser.showOpenDialog(stage);
-        if (selectedFile != null) {
-            sourcePathField.setText(selectedFile.getAbsolutePath());
-        }
-    }
-
-    @FXML
     public void onBrowseTargetFile(javafx.event.ActionEvent event) {
-        FileChooser fileChooser = new FileChooser();
+        DirectoryChooser directoryChooser = new DirectoryChooser();
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        File selectedFile = fileChooser.showSaveDialog(stage);
-        if (selectedFile != null) {
-            targetPathField.setText(selectedFile.getAbsolutePath());
+        File selectedDirectory = directoryChooser.showDialog(stage);
+        if (selectedDirectory != null) {
+            targetPathField.setText(selectedDirectory.getAbsolutePath());
         }
     }
 
     @FXML
     public void onDisplayContents() {
-        Path directory = Paths.get(directoryPathField.getText());
-        List<File> files = directoryService.listDirectoryContents(directory.toFile());
+        currentDirectory = Paths.get(directoryPathField.getText());
+        List<File> files = directoryService.listDirectoryContents(currentDirectory.toFile());
         listView.getItems().clear();
         if (files != null) {
             for (File file : files) {
@@ -80,9 +70,9 @@ public class HelloController {
 
     @FXML
     public void onSearchFiles() {
-        Path directory = Paths.get(directoryPathField.getText());
+        currentDirectory = Paths.get(directoryPathField.getText());
         String query = searchField.getText();
-        List<File> results = searchService.searchFiles(directory.toFile(), query);
+        List<File> results = searchService.searchFiles(currentDirectory.toFile(), query);
         listView.getItems().clear();
         for (File file : results) {
             listView.getItems().add(file.getName());
@@ -130,51 +120,59 @@ public class HelloController {
         boolean success = directoryService.deleteDirectory(directoryFile);
         if (success) {
             System.out.println("Directory deleted successfully: " + directoryFile.getAbsolutePath());
-            // Do not attempt to list contents if the directory was successfully deleted
-            directoryPathField.clear();
-            listView.getItems().clear();
+            onDisplayContents(); // Refresh the display
         } else {
             System.err.println("Failed to delete directory: " + directoryFile.getAbsolutePath());
         }
     }
 
-
-
     @FXML
     public void onCopyFile() {
-        Path source = Paths.get(sourcePathField.getText());
-        Path target = Paths.get(targetPathField.getText());
-        boolean success = fileService.copyFile(source, target);
-        if (success) {
-            System.out.println("File copied successfully.");
-            onDisplayContents();
-        } else {
-            System.err.println("Failed to copy file.");
-        }
+        handleFileOperation(FileOperation.COPY);
     }
 
     @FXML
     public void onMoveFile() {
-        Path source = Paths.get(sourcePathField.getText());
-        Path target = Paths.get(targetPathField.getText());
-        boolean success = fileService.moveFile(source, target);
-        if (success) {
-            System.out.println("File moved successfully.");
-            onDisplayContents();
-        } else {
-            System.err.println("Failed to move file.");
-        }
+        handleFileOperation(FileOperation.MOVE);
     }
 
     @FXML
     public void onDeleteFile() {
-        Path file = Paths.get(sourcePathField.getText());
-        boolean success = fileService.deleteFile(file);
+        handleFileOperation(FileOperation.DELETE);
+    }
+
+    private void handleFileOperation(FileOperation operation) {
+        String selectedFileName = listView.getSelectionModel().getSelectedItem();
+        if (selectedFileName == null || (operation != FileOperation.DELETE && targetPathField.getText().isEmpty())) {
+            System.err.println("No file selected or target path is empty.");
+            return;
+        }
+
+        Path source = currentDirectory.resolve(selectedFileName);
+        Path target = operation != FileOperation.DELETE ? Paths.get(targetPathField.getText()).resolve(selectedFileName) : null;
+
+        boolean success = false;
+        switch (operation) {
+            case COPY:
+                success = fileService.copyFile(source, target);
+                break;
+            case MOVE:
+                success = fileService.moveFile(source, target);
+                break;
+            case DELETE:
+                success = fileService.deleteFile(source);
+                break;
+        }
+
         if (success) {
-            System.out.println("File deleted successfully.");
+            System.out.println("File " + operation.name().toLowerCase() + "d successfully.");
             onDisplayContents();
         } else {
-            System.err.println("Failed to delete file.");
+            System.err.println("Failed to " + operation.name().toLowerCase() + " file.");
         }
+    }
+
+    private enum FileOperation {
+        COPY, MOVE, DELETE
     }
 }
